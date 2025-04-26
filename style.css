@@ -1,0 +1,26 @@
+
+body {
+  font-family: Arial, sans-serif;
+  padding: 10px;
+}
+
+#matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.quadrant {
+  border: 2px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.done {
+  text-decoration: line-through;
+  color: gray;
+}
+
+#add-task {
+  margin-top: 20px;
+}

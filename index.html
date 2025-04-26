@@ -1,128 +1,46 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eisenhower Matrix App</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0288d1" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
-    h1 { text-align: center; margin-bottom: 20px; }
-    .task-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    input, select, button { padding: 10px; font-size: 1rem; }
-    .matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .quadrant { background: #fff; padding: 10px; border-radius: 8px; min-height: 150px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .quadrant h3 { margin-bottom: 10px; }
-    .task { background: #e0f7fa; margin: 5px 0; padding: 8px; border-radius: 5px; }
-    #stats { margin-top: 30px; background: #fff; padding: 10px; border-radius: 8px; }
-    canvas { width: 100% !important; max-width: 100%; height: auto !important; }
-    @media (max-width: 600px) {
-      .matrix { grid-template-columns: 1fr; }
-    }
-  </style>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Eisenhower Matrix</h1>
-  <div class="task-form">
-    <input type="text" id="taskName" placeholder="Task name..." />
-    <select id="urgency">
-      <option value="high">Urgent</option>
-      <option value="low">Not Urgent</option>
-    </select>
-    <select id="importance">
-      <option value="high">Important</option>
-      <option value="low">Not Important</option>
+  <div id="matrix">
+    <div class="quadrant" id="urgent-important">
+      <h2>Do (Urgent + Important)</h2>
+      <ul id="do-list"></ul>
+    </div>
+    <div class="quadrant" id="not-urgent-important">
+      <h2>Plan (Not Urgent + Important)</h2>
+      <ul id="plan-list"></ul>
+    </div>
+    <div class="quadrant" id="urgent-not-important">
+      <h2>Delegate (Urgent + Not Important)</h2>
+      <ul id="delegate-list"></ul>
+    </div>
+    <div class="quadrant" id="not-urgent-not-important">
+      <h2>Eliminate (Not Urgent + Not Important)</h2>
+      <ul id="eliminate-list"></ul>
+    </div>
+  </div>
+
+  <div id="add-task">
+    <h2>Add a Task</h2>
+    <input type="text" id="task-name" placeholder="Task Name">
+    <select id="task-category">
+      <option value="do">Do (Urgent + Important)</option>
+      <option value="plan">Plan (Not Urgent + Important)</option>
+      <option value="delegate">Delegate (Urgent + Not Important)</option>
+      <option value="eliminate">Eliminate (Not Urgent + Not Important)</option>
     </select>
     <button onclick="addTask()">Add Task</button>
   </div>
 
-  <div class="matrix">
-    <div class="quadrant" id="do">
-      <h3>Do (Urgent & Important)</h3>
-    </div>
-    <div class="quadrant" id="decide">
-      <h3>Decide (Not Urgent & Important)</h3>
-    </div>
-    <div class="quadrant" id="delegate">
-      <h3>Delegate (Urgent & Not Important)</h3>
-    </div>
-    <div class="quadrant" id="delete">
-      <h3>Delete (Not Urgent & Not Important)</h3>
-    </div>
-  </div>
-
-  <div id="stats">
-    <h3>Daily Task Stats</h3>
-    <canvas id="statsChart"></canvas>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const scores = { do: 10, decide: 7, delegate: 5, delete: 2 };
-    const counts = { do: 0, decide: 0, delegate: 0, delete: 0 };
-
-    function getCategory(urgency, importance) {
-      if (urgency === 'high' && importance === 'high') return 'do';
-      if (urgency === 'low' && importance === 'high') return 'decide';
-      if (urgency === 'high' && importance === 'low') return 'delegate';
-      return 'delete';
-    }
-
-    function addTask() {
-      const name = document.getElementById('taskName').value;
-      const urgency = document.getElementById('urgency').value;
-      const importance = document.getElementById('importance').value;
-      if (!name) return;
-
-      const category = getCategory(urgency, importance);
-      const container = document.getElementById(category);
-      const taskElem = document.createElement('div');
-      taskElem.className = 'task';
-      taskElem.textContent = name;
-      container.appendChild(taskElem);
-
-      counts[category]++;
-      updateChart();
-
-      document.getElementById('taskName').value = '';
-    }
-
-    const ctx = document.getElementById('statsChart').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Do', 'Decide', 'Delegate', 'Delete'],
-        datasets: [{
-          label: 'Score',
-          data: [0, 0, 0, 0],
-          backgroundColor: ['#0288d1', '#43a047', '#fbc02d', '#e53935']
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
-
-    function updateChart() {
-      chart.data.datasets[0].data = [
-        counts.do * scores.do,
-        counts.decide * scores.decide,
-        counts.delegate * scores.delegate,
-        counts.delete * scores.delete
-      ];
-      chart.update();
-    }
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').then(() => {
-        console.log('Service Worker Registered');
-      });
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
